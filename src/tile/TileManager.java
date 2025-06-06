@@ -58,8 +58,13 @@ public class TileManager {
 
             //tree tiles
             tile[1] = new Tile();
-            tile[1].image = ImageIO.read(getClass().getResourceAsStream("/tiles/tile1.png")); //might need to fix the file name
+            tile[1].image = ImageIO.read(getClass().getResourceAsStream("/tiles/tile2.png")); //might need to fix the file name
             tile[1].collision = true;
+
+            //bush tiles
+            tile[2] = new Tile();
+            tile[2].image = ImageIO.read(getClass().getResourceAsStream("/tiles/tile3.png"));
+
 
         } catch (IOException e) {
             e.printStackTrace();

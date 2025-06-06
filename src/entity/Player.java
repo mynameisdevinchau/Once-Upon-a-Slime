@@ -8,7 +8,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-public class Player extends Entity{
+public class Player extends Entity {
 
     GamePanel gp;
     KeyHandler keyH;
@@ -16,14 +16,14 @@ public class Player extends Entity{
     public final int screenX;
     public final int screenY;
 
-    public Player(GamePanel gp, KeyHandler keyH){
+    public Player(GamePanel gp, KeyHandler keyH) {
         this.gp = gp;
         this.keyH = keyH;
 
-        screenX = gp.screenWidth/ 2 - (gp.tileSize/2);
-        screenY = gp.screenHeight/ 2 - (gp.tileSize/2);
+        screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
+        screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
 
-        solidArea=  new Rectangle();
+        solidArea = new Rectangle();
         solidArea.x = 8;
         solidArea.y = 16;
         solidArea.width = 32;
@@ -33,81 +33,89 @@ public class Player extends Entity{
         getPlayerImage();
     }
 
-    public void setDefaultValues(){
+    public void setDefaultValues() {
 
-        worldX = gp.tileSize*23;
-        worldY = gp.tileSize*23;
+        //where you spawn
+        worldX = 43; //gp.tileSize();
+        worldY = 2304;
         speed = 4;
 
         direction = "right";
+
+        // Gravity setup
+        gravity = 0.7;
+        jumpStrength = -10;
+        velocityY = 0;
+        onGround = false;
     }
 
-    public void update(){
-        if(keyH.upPressed){
-            direction = "jump";
-        } else if(keyH.downPressed){
-            direction = "down";
-
-        } else if (keyH.leftPressed) {
-            direction = "left";
-
-        } else if(keyH.rightPressed){
-            direction = "right";
-
+    public void update() {
+        // Jump if up key is pressed and on ground
+        if (keyH.upPressed) {
+            jump();
         }
-        //this is used to check if the tile can be walked on
-        collisionOn = false;
-        gp.collisionChecker.checkTile(this);
 
-        //if collision is false, the player should be able to move
+        // Duck
+        if (keyH.downPressed) {
+            direction = "down";
+        }
 
-        //fixme: for some reason, it continues to press the key without stopping after release. 
-        if(!collisionOn){
-            switch(direction){
-                case "jump":
-                    worldY -= speed;
-                    break;
-                case "down":
-                    worldY += speed;
-                    break;
-                case "left":
-                    worldX -= speed;
-                    break;
-                case "right":
-                    worldX += speed;
-                    break;
+        // Horizontal movement
+        if (keyH.leftPressed) {
+            direction = "left";
+            collisionOn = false;
+            gp.collisionChecker.checkTile(this);
+            if (!collisionOn) {
+                worldX -= speed;
+            }
+        } else if (keyH.rightPressed) {
+            direction = "right";
+            collisionOn = false;
+            gp.collisionChecker.checkTile(this);
+            if (!collisionOn) {
+                worldX += speed;
             }
         }
+
+        // Apply gravity (handles onGround flag internally)
+        applyGravity(gp);
     }
 
-    public void getPlayerImage(){
-        try{
-            //update this so you can create sprite images for your drawings
-            jump = ImageIO.read(getClass().getResourceAsStream("/player/jump_mr_slime.png"));
-            down = ImageIO.read(getClass().getResourceAsStream("/player/get_down_mr_slime.png"));
-            left = ImageIO.read(getClass().getResourceAsStream("/player/step_to_the_left_slime.png"));
-            right = ImageIO.read(getClass().getResourceAsStream("/player/step_to_the_right_slime.png"));
-
-        } catch(IOException e){
+    public void getPlayerImage() {
+        try {
+            jumpLeft = ImageIO.read(getClass().getResourceAsStream("/player/slime_jump_left.png"));
+            jumpRight = ImageIO.read(getClass().getResourceAsStream("/player/slime_jump_right.png"));
+            downLeft = ImageIO.read(getClass().getResourceAsStream("/player/slime_down_left.png"));
+            downRight = ImageIO.read(getClass().getResourceAsStream("/player/slime_down_right.png"));
+            left = ImageIO.read(getClass().getResourceAsStream("/player/slime_left.png"));
+            right = ImageIO.read(getClass().getResourceAsStream("/player/slime_right.png"));
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    public void draw(Graphics2D g2){
-        BufferedImage image = null;
-        switch(direction){
-            case "jump":
-                image = jump;
-                break;
-            case "down":
-                image = down;
-                break;
-            case "left":
+
+
+    public void draw(Graphics2D g2) {
+        BufferedImage image;
+
+        if (!onGround) {
+            image = direction.equals("left") ? jumpLeft : jumpRight;
+        } else if (keyH.leftPressed) {
+            image = left;
+        } else if (keyH.rightPressed) {
+            image = right;
+        } else {
+            // Idle or duck
+            if (direction.equals("down")) {
+                image = direction.equals("left") ? downLeft : downRight;
+            } else if (direction.equals("left")) {
                 image = left;
-                break;
-            case "right":
+            } else {
                 image = right;
-                break;
+            }
         }
+
         g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
     }
+
 }
