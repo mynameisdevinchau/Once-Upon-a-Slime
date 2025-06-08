@@ -8,8 +8,9 @@ import java.awt.*;
 
 public class GamePanel extends JPanel implements Runnable{
 
-    //to create the screen settings
-    final int originalTileSize = 16; //16x16 tile
+
+
+    final int originalTileSize = 16;// 32;
     final int scale = 3;
 
     public final int tileSize = originalTileSize * scale;
@@ -98,4 +99,5 @@ public class GamePanel extends JPanel implements Runnable{
         //dispose of graphics  content. think of closing a scanner
         g2.dispose();
     }
+
 }

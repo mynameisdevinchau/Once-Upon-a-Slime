@@ -35,32 +35,33 @@ public class Player extends Entity {
 
     public void setDefaultValues() {
 
-        //where you spawn
-        worldX = 43; //gp.tileSize();
+        //where you spawn. i'll need to adjust this as more maps are created
+        worldX = 100; //gp.tileSize();
         worldY = 2304;
         speed = 4;
 
         direction = "right";
 
-        // Gravity setup
+        //gravity setup
         gravity = 0.7;
         jumpStrength = -10;
         velocityY = 0;
         onGround = false;
+        //maybe we can change different maps and adjust this setting based on the value? i'll need to keep an eye on this
     }
 
     public void update() {
-        // Jump if up key is pressed and on ground
+        //jump if up key is pressed and on ground
         if (keyH.upPressed) {
             jump();
         }
 
-        // Duck
+        //duck
         if (keyH.downPressed) {
             direction = "down";
         }
 
-        // Horizontal movement
+        //horizontal movement
         if (keyH.leftPressed) {
             direction = "left";
             collisionOn = false;
@@ -77,7 +78,7 @@ public class Player extends Entity {
             }
         }
 
-        // Apply gravity (handles onGround flag internally)
+        //apply gravity
         applyGravity(gp);
     }
 
@@ -107,6 +108,8 @@ public class Player extends Entity {
         } else {
             // Idle or duck
             if (direction.equals("down")) {
+
+                //this causes the slime not to look down left which is a problem that needs to be kept track of
                 image = direction.equals("left") ? downLeft : downRight;
             } else if (direction.equals("left")) {
                 image = left;

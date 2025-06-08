@@ -4,6 +4,7 @@ import main.GamePanel;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
+//i'll need to fix my superclass so it is less specific and more "building blocks"
 public class Entity {
 
     // setting world size and speed
