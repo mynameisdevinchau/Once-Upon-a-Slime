@@ -107,6 +107,26 @@ public class TileManager {
                 int screenX = worldX - gp.player.worldX + gp.player.screenX;
                 int screenY = worldY - gp.player.worldY + gp.player.screenY;
 
+
+                //this will stop moving the camera if we reach the world's edge
+                if(gp.player.screenX > gp.player.worldX){
+                    screenX = worldX;
+                }
+                if(gp.player.screenY > gp.player.worldY){
+                    screenY = worldY;
+                }
+
+
+                int rightOffset = gp.screenWidth - gp.player.screenX;
+                if(rightOffset > gp.worldWidth - gp.player.worldX){
+                    screenX = gp.screenWidth - (gp.worldWidth - worldX);
+                }
+                int bottomOffset = gp.screenHeight - gp.player.screenY;
+                if(bottomOffset > gp.worldHeight - gp.player.worldY){
+                    screenY = gp.worldHeight - (gp.worldHeight - worldY);
+                }
+
+
                 //only draw tiles inside the camera view
                 if (worldX + gp.tileSize  > gp.player.worldX - gp.player.screenX &&
                         worldX - gp.tileSize  < gp.player.worldX + gp.player.screenX &&
