@@ -47,7 +47,7 @@ public class Entity {
         if (belowCol >= 0 && belowCol < gp.maxWorldCol &&
                 belowRow >= 0 && belowRow < gp.maxWorldRow) {
 
-            int tileBelow = gp.tileManager.mapTileNumber[belowCol][belowRow];
+            int tileBelow = gp.tileManager.mapTileNumber[gp.currentMap][belowCol][belowRow];
             tileBelowIsSolid = gp.tileManager.tile[tileBelow].collision;
         }
 

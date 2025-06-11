@@ -9,99 +9,70 @@ public class CollisionChecker {
     }
 
     public void checkTile(Entity entity) {
+        // 1) start fresh each tick
+        entity.collisionOn = false;
 
-        int entityLeftWorldX = entity.worldX + entity.solidArea.x;
-        int entityRightWorldX = entity.worldX + entity.solidArea.x + entity.solidArea.width - 1;
-        int entityTopWorldY = entity.worldY + entity.solidArea.y;
-        int entityBottomWorldY = entity.worldY + entity.solidArea.y + entity.solidArea.height - 1;
+        // 2) calculate the world‐coords of your entity’s solid box
+        int leftX   = entity.worldX + entity.solidArea.x;
+        int rightX  = entity.worldX + entity.solidArea.x + entity.solidArea.width - 1;
+        int topY    = entity.worldY + entity.solidArea.y;
+        int bottomY = entity.worldY + entity.solidArea.y + entity.solidArea.height - 1;
 
-        int entityLeftCol = entityLeftWorldX / gp.tileSize;
-        int entityRightCol = entityRightWorldX / gp.tileSize;
-        int entityTopRow = entityTopWorldY / gp.tileSize;
-        int entityBottomRow = entityBottomWorldY / gp.tileSize;
+        // 3) find the current tile‐cols and rows
+        int leftCol   =  leftX  / gp.tileSize;
+        int rightCol  =  rightX / gp.tileSize;
+        int topRow    =  topY   / gp.tileSize;
+        int bottomRow =  bottomY/ gp.tileSize;
 
-        int tileNum1, tileNum2;
+        int tileA_bg, tileB_bg;   // background
+        int tileA_fg, tileB_fg;   // foreground
 
-        System.out.println("Checking direction: " + entity.direction);
-
-        switch (entity.direction) {
+        switch(entity.direction) {
             case "jump":
-                entityTopRow = (entityTopWorldY - entity.speed) / gp.tileSize;
-                if (entityTopRow >= 0 && entityTopRow < gp.tileManager.mapTileNumber[0].length &&
-                        entityLeftCol >= 0 && entityLeftCol < gp.tileManager.mapTileNumber.length &&
-                        entityRightCol >= 0 && entityRightCol < gp.tileManager.mapTileNumber.length) {
-
-                    tileNum1 = gp.tileManager.mapTileNumber[entityLeftCol][entityTopRow];
-                    tileNum2 = gp.tileManager.mapTileNumber[entityRightCol][entityTopRow];
-
-                    System.out.println("Jump tiles: " + tileNum1 + ", " + tileNum2);
-
-                    if (gp.tileManager.tile[tileNum1].collision || gp.tileManager.tile[tileNum2].collision) {
-                        entity.collisionOn = true;
-                        System.out.println("Collision on jump!");
-                    }
-                }
+                topRow = (topY - entity.speed) / gp.tileSize;
+                // check both corners: left & right
+                tileA_bg = gp.tileManager.background[gp.currentMap][leftCol][ topRow];
+                tileB_bg = gp.tileManager.background[gp.currentMap][rightCol][ topRow];
+                tileA_fg = gp.tileManager.mapTileNumber[gp.currentMap][ leftCol][ topRow];
+                tileB_fg = gp.tileManager.mapTileNumber[gp.currentMap][rightCol][ topRow];
                 break;
 
             case "down":
-                entityBottomRow = (entityBottomWorldY + entity.speed) / gp.tileSize;
-                if (entityBottomRow >= 0 && entityBottomRow < gp.tileManager.mapTileNumber[0].length &&
-                        entityLeftCol >= 0 && entityLeftCol < gp.tileManager.mapTileNumber.length &&
-                        entityRightCol >= 0 && entityRightCol < gp.tileManager.mapTileNumber.length) {
-
-                    tileNum1 = gp.tileManager.mapTileNumber[entityLeftCol][entityBottomRow];
-                    tileNum2 = gp.tileManager.mapTileNumber[entityRightCol][entityBottomRow];
-
-                    System.out.println("Down tiles: " + tileNum1 + ", " + tileNum2);
-
-                    if (gp.tileManager.tile[tileNum1].collision || gp.tileManager.tile[tileNum2].collision) {
-                        entity.collisionOn = true;
-                        System.out.println("Collision on down!");
-                    }
-                }
+                bottomRow = (bottomY + entity.speed) / gp.tileSize;
+                tileA_bg = gp.tileManager.background[gp.currentMap][leftCol][ bottomRow];
+                tileB_bg = gp.tileManager.background[gp.currentMap][rightCol][ bottomRow];
+                tileA_fg = gp.tileManager.mapTileNumber[gp.currentMap][ leftCol][ bottomRow];
+                tileB_fg = gp.tileManager.mapTileNumber[gp.currentMap][rightCol][ bottomRow];
                 break;
 
             case "left":
-                entityLeftCol = (entityLeftWorldX - entity.speed) / gp.tileSize;
-                if (entityLeftCol >= 0 && entityLeftCol < gp.tileManager.mapTileNumber.length &&
-                        entityTopRow >= 0 && entityTopRow < gp.tileManager.mapTileNumber[0].length &&
-                        entityBottomRow >= 0 && entityBottomRow < gp.tileManager.mapTileNumber[0].length) {
-
-                    tileNum1 = gp.tileManager.mapTileNumber[entityLeftCol][entityTopRow];
-                    tileNum2 = gp.tileManager.mapTileNumber[entityLeftCol][entityBottomRow];
-
-                    System.out.println("Left tiles: " + tileNum1 + ", " + tileNum2);
-
-                    if (gp.tileManager.tile[tileNum1].collision || gp.tileManager.tile[tileNum2].collision) {
-                        entity.collisionOn = true;
-                        System.out.println("Collision on left!");
-                    }
-                }
+                leftCol = (leftX - entity.speed) / gp.tileSize;
+                tileA_bg = gp.tileManager.background[gp.currentMap][ leftCol][ topRow];
+                tileB_bg = gp.tileManager.background[gp.currentMap][ leftCol][ bottomRow];
+                tileA_fg = gp.tileManager.mapTileNumber[gp.currentMap][ leftCol][ topRow];
+                tileB_fg = gp.tileManager.mapTileNumber[gp.currentMap][ leftCol][ bottomRow];
                 break;
 
             case "right":
-                entityRightCol = (entityRightWorldX + entity.speed) / gp.tileSize;
-                if (entityRightCol >= 0 && entityRightCol < gp.tileManager.mapTileNumber.length &&
-                        entityTopRow >= 0 && entityTopRow < gp.tileManager.mapTileNumber[0].length &&
-                        entityBottomRow >= 0 && entityBottomRow < gp.tileManager.mapTileNumber[0].length) {
-
-                    tileNum1 = gp.tileManager.mapTileNumber[entityRightCol][entityTopRow];
-                    tileNum2 = gp.tileManager.mapTileNumber[entityRightCol][entityBottomRow];
-
-                    System.out.println("Right tiles: " + tileNum1 + ", " + tileNum2);
-
-                    if (gp.tileManager.tile[tileNum1].collision || gp.tileManager.tile[tileNum2].collision) {
-                        entity.collisionOn = true;
-                        System.out.println("Collision on right!");
-                    }
-                }
+                rightCol = (rightX + entity.speed) / gp.tileSize;
+                tileA_bg = gp.tileManager.background[gp.currentMap][ rightCol][ topRow];
+                tileB_bg = gp.tileManager.background[gp.currentMap][ rightCol][ bottomRow];
+                tileA_fg = gp.tileManager.mapTileNumber[gp.currentMap][ rightCol][ topRow];
+                tileB_fg = gp.tileManager.mapTileNumber[gp.currentMap][ rightCol][ bottomRow];
                 break;
+
+            default:
+                // no movement? bail out
+                return;
         }
 
-        System.out.println("Entity pos (worldX, worldY): (" + entity.worldX + ", " + entity.worldY + ")");
-        System.out.println("Entity cols (L,R): " + entityLeftCol + ", " + entityRightCol);
-        System.out.println("Entity rows (T,B): " + entityTopRow + ", " + entityBottomRow);
-        System.out.println("Collision status: " + entity.collisionOn);
+        // 4) If **either** layer’s tile has `collision == true`, block the movement
+        if (   gp.tileManager.tile[tileA_bg].collision
+                || gp.tileManager.tile[tileB_bg].collision
+                || gp.tileManager.tile[tileA_fg].collision
+                || gp.tileManager.tile[tileB_fg].collision) {
+            entity.collisionOn = true;
+        }
     }
 
 
