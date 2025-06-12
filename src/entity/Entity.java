@@ -68,7 +68,6 @@ public class Entity {
 
     public void jump() {
         if (onGround) {
-            System.out.println("JUMP!");
             velocityY = jumpStrength;
             onGround = false;
         } else {

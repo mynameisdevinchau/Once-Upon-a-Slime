@@ -6,7 +6,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-
+import object.SuperObject;
 public class Player extends Entity {
 
     GamePanel gp;
@@ -27,20 +27,41 @@ public class Player extends Entity {
         getPlayerImage();
     }
 
+
+
     public void setDefaultValues() {
         worldX = 100;
         worldY = 2304;
         speed = 4;
         direction = "right";
         gravity = 0.7;
-        jumpStrength = -15;
+        jumpStrength = -12;
         velocityY = 0;
         onGround = false;
+    }
+
+
+    private boolean isTouching(SuperObject obj) {
+        Rectangle playerBox = new Rectangle(worldX + solidArea.x, worldY + solidArea.y, solidArea.width, solidArea.height);
+        Rectangle objBox = new Rectangle(obj.worldX, obj.worldY, gp.tileSize, gp.tileSize);
+        return playerBox.intersects(objBox);
     }
 
     public void update() {
         if (keyH.upPressed && onGround) jump();
         if (keyH.downPressed) direction = "down";
+
+        //used to interact
+        if(keyH.spacePressed){
+            for (SuperObject obj : gp.objects) {
+                if (isTouching(obj)) {
+                    System.out.println("Interacted!");
+                    obj.interact(gp);
+                    keyH.spacePressed = false;
+                    break;
+                }
+            }
+        }
 
         if (keyH.leftPressed) {
             direction = "left";
@@ -69,6 +90,8 @@ public class Player extends Entity {
         }
     }
 
+
+
     public void draw(Graphics2D g2) {
         BufferedImage image;
         if (!onGround)           image = direction.equals("left") ? jumpLeft  : jumpRight;
@@ -81,6 +104,8 @@ public class Player extends Entity {
         // screen position = world position minus camera offset
         int screenX = worldX - gp.cameraX;
         int screenY = worldY - gp.cameraY;
+
+
 
         g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
     }
